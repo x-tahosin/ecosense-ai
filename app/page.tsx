@@ -4,7 +4,11 @@ import {
   Leaf, TreePine, Car, Utensils, Zap, ShoppingBag,
   Droplets, Wind, ArrowRight, Sparkles, RotateCcw,
   Globe, CheckCircle, AlertTriangle, TrendingDown, Copy, Check,
+  Trees, Brain, ExternalLink,
 } from "lucide-react";
+
+const SOLANA_WALLET = "4tG9RnPzGMHkFzFXbNjM7XDBkgJq8eJTwqFxUxRBFV3p";
+const BACKBOARD_THREAD_KEY = "ecosense_user_";
 
 const TRANSPORT_OPTIONS = [
   { id: "car_gas", label: "Gas Car", icon: Car, co2: "high" },
@@ -63,6 +67,16 @@ export default function Home() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showSolana, setShowSolana] = useState(false);
+  const [sessionId] = useState(() => {
+    if (typeof window !== "undefined") {
+      let id = localStorage.getItem("ecosense_session");
+      if (!id) { id = Math.random().toString(36).slice(2); localStorage.setItem("ecosense_session", id); }
+      return id;
+    }
+    return "anon";
+  });
+  const [memoryStatus, setMemoryStatus] = useState<"idle"|"saving"|"saved">("idle");
 
   const canProceed = () => {
     if (step === 0) return !!transport;
@@ -118,6 +132,23 @@ Return this exact JSON structure:
       const parsed = JSON.parse(jsonMatch[0]) as AnalysisResult;
       setResult(parsed);
       setStep(5);
+
+      // Save to Backboard memory (if available)
+      try {
+        setMemoryStatus("saving");
+        await fetch("/api/memory", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId,
+            score: parsed.score,
+            grade: parsed.grade,
+            footprint_kg: parsed.footprint_kg,
+            transport, diet, energy, shopping,
+          }),
+        });
+        setMemoryStatus("saved");
+      } catch { setMemoryStatus("idle"); }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -458,6 +489,58 @@ Return this exact JSON structure:
               </div>
             </div>
 
+            {/* Solana Carbon Offset */}
+            <div className="rounded-2xl bg-white border border-border p-6 card-glow mb-6">
+              <h3 className="font-bold mb-2 flex items-center gap-2">
+                <Trees className="h-4 w-4 text-green-600" />
+                Offset Your Carbon — Plant a Tree
+              </h3>
+              <p className="text-sm text-muted mb-3">
+                Offset ~{result.footprint_kg > 0 ? Math.ceil(result.footprint_kg / 22) : 1} trees would neutralize your annual footprint.
+                Donate SOL via Solana to fund tree planting.
+              </p>
+              {!showSolana ? (
+                <button
+                  onClick={() => setShowSolana(true)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-sm font-bold hover:opacity-90 transition-opacity"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" /> Donate with Solana
+                </button>
+              ) : (
+                <div className="rounded-xl bg-purple-50 border border-purple-200 p-4">
+                  <p className="text-xs font-medium text-purple-700 mb-2">Send any amount of SOL to:</p>
+                  <div className="flex items-center gap-2">
+                    <code className="text-xs bg-white px-2 py-1 rounded border border-purple-200 flex-1 overflow-hidden text-ellipsis">{SOLANA_WALLET}</code>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(SOLANA_WALLET); }}
+                      className="px-2 py-1 rounded bg-purple-600 text-white text-xs hover:bg-purple-700"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <a
+                    href={`https://explorer.solana.com/address/${SOLANA_WALLET}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-purple-600 hover:underline mt-2"
+                  >
+                    View on Solana Explorer <ExternalLink className="h-3 w-3" />
+                  </a>
+                  <p className="text-xs text-muted mt-2">Powered by Solana — fast, low-fee, eco-friendly blockchain</p>
+                </div>
+              )}
+            </div>
+
+            {/* Backboard Memory Status */}
+            {memoryStatus !== "idle" && (
+              <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 mb-6 flex items-center gap-2 text-xs">
+                <Brain className="h-3.5 w-3.5 text-blue-600" />
+                <span className="text-blue-700">
+                  {memoryStatus === "saving" ? "Saving your results to memory..." : "Results saved! Your next assessment will show progress over time."}
+                </span>
+                <span className="text-blue-400 ml-auto">Powered by Backboard</span>
+              </div>
+            )}
+
             {/* Earth Pledge */}
             <div className="rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 p-6 text-white mb-6">
               <h3 className="font-bold mb-2 flex items-center gap-2">
@@ -474,10 +557,17 @@ Return this exact JSON structure:
               </button>
             </div>
 
-            {/* Gemini Badge */}
-            <div className="text-center text-xs text-muted">
-              <Sparkles className="h-3 w-3 inline mr-1" />
-              Analysis powered by Google Gemini 2.0 Flash • Built for Earth Day 2026
+            {/* Tech Badges */}
+            <div className="text-center text-xs text-muted space-y-1">
+              <div>
+                <Sparkles className="h-3 w-3 inline mr-1" />
+                Analysis powered by Google Gemini 2.0 Flash
+              </div>
+              <div>
+                <Brain className="h-3 w-3 inline mr-1" />
+                Memory by Backboard • Carbon offset via Solana
+              </div>
+              <div>Built for Earth Day 2026</div>
             </div>
           </div>
         )}
@@ -523,9 +613,11 @@ Return this exact JSON structure:
         <p>
           Built with <span className="text-accent">♥</span> for Earth Day 2026 •{" "}
           Powered by{" "}
-          <a href="https://ai.google.dev/gemini-api" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">
-            Google Gemini
-          </a>
+          <a href="https://ai.google.dev/gemini-api" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">Google Gemini</a>
+          {" • "}
+          <a href="https://backboard.io" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">Backboard</a>
+          {" • "}
+          <a href="https://solana.com" className="text-accent hover:underline" target="_blank" rel="noopener noreferrer">Solana</a>
         </p>
       </footer>
     </div>
