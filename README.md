@@ -1,44 +1,86 @@
-# EcoSense AI 🌍
+<div align="center">
 
-**AI-Powered Carbon Footprint Analyzer** — Built for Earth Day 2026
+# 🌍 EcoSense AI
+
+**AI-Powered Carbon Footprint Analyzer | Earth Day 2026**
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-ecosense--ai.pages.dev-00C853?style=for-the-badge&logo=googlechrome&logoColor=white)](https://ecosense-ai.pages.dev)
+[![Dev.to](https://img.shields.io/badge/Challenge_Submission-DEV.to-0A0A0A?style=for-the-badge&logo=devdotto&logoColor=white)](https://dev.to/tahosin/ecosense-ai-know-your-carbon-footprint-in-60-seconds-3gac)
+
+![Next.js](https://img.shields.io/badge/Next.js_16-000?style=flat-square&logo=next.js)
+![Gemini](https://img.shields.io/badge/Google_Gemini-4285F4?style=flat-square&logo=google&logoColor=white)
+![Backboard](https://img.shields.io/badge/Backboard-5C6BC0?style=flat-square)
+![Solana](https://img.shields.io/badge/Solana-9945FF?style=flat-square&logo=solana&logoColor=white)
+![Cloudflare](https://img.shields.io/badge/Cloudflare_Pages-F38020?style=flat-square&logo=cloudflare&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+
+</div>
+
+---
 
 ## What It Does
-Answer 4 quick questions about your daily habits (transport, diet, energy, shopping) and EcoSense AI uses **Google Gemini** to:
-- Calculate your estimated annual carbon footprint
-- Grade your eco-friendliness (A+ to F)
-- Show impact breakdown by category
-- Give 5 personalized tips to reduce your footprint
-- Generate a shareable Earth Day pledge
 
-## Live Demo
-**[https://ecosense-ai.pages.dev](https://ecosense-ai.pages.dev)**
+Answer 4 quick questions about your daily habits and **Google Gemini** analyzes your carbon footprint in real-time:
 
-## Tech Stack
-- **Next.js 16** (static export)
-- **Tailwind CSS** (custom Earth Day theme)
-- **Google Gemini 2.0 Flash** (AI analysis via server-side proxy)
-- **Cloudflare Pages** (hosting + serverless functions)
-- **Lucide React** (icons)
+- **Eco Score** (0-100) with letter grade and SVG donut chart
+- **Estimated annual CO2** compared to global average
+- **Impact breakdown** by category (transport, diet, energy, shopping)
+- **5 personalized tips** to reduce your footprint
+- **Earth Day pledge** — copy and share on social media
+- **Carbon offset** — donate SOL via Solana to plant trees
+- **Progress tracking** — Backboard memory saves your assessments
 
 ## Architecture
+
 ```
 Browser → Static HTML/JS (Cloudflare Pages)
             ↓
-         /api/generate (Cloudflare Function — server-side only)
-            ↓
-         Google Gemini API (key never exposed to client)
+         /api/generate → Cloudflare Function → Google Gemini API
+         /api/memory   → Cloudflare Function → Backboard API
+         
+         API keys NEVER reach the browser.
 ```
 
-## Setup
+## Tech Stack
+
+| Technology | Purpose |
+|-----------|---------|
+| **Next.js 16** | Static export frontend |
+| **Google Gemini 2.0 Flash** | AI analysis engine |
+| **Backboard** | Persistent memory threads |
+| **Solana** | Carbon offset donations |
+| **Cloudflare Pages** | Hosting + serverless functions |
+| **Tailwind CSS** | Earth Day green theme |
+| **Lucide React** | Icons |
+
+## Quick Start
+
 ```bash
+git clone https://github.com/x-tahosin/ecosense-ai.git
+cd ecosense-ai
 npm install
 npm run build
-# Deploy: wrangler pages deploy out
-# Set GEMINI_API_KEY in Cloudflare Pages environment variables
 ```
 
-## Built for
-[DEV Weekend Challenge: Earth Day Edition](https://dev.to/challenges/weekend-2026-04-16)
+Set environment variables on Cloudflare Pages:
+- `GEMINI_API_KEY` — Google Gemini API key
+- `BACKBOARD_API_KEY` — Backboard API key
+
+Deploy:
+```bash
+wrangler pages deploy out --project-name ecosense-ai
+```
+
+## Built For
+
+[DEV Weekend Challenge: Earth Day Edition](https://dev.to/challenges/weekend-2026-04-16) — $1,000 prize pool
+
+**Prize Categories:** Best Use of Google Gemini • Best Use of Backboard • Best Use of Solana • Best Use of GitHub Copilot
 
 ---
-Made with ♥ for our planet 🌱
+
+<div align="center">
+
+Made with 💚 for our planet
+
+</div>
