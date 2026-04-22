@@ -16,6 +16,13 @@
 
 </div>
 
+
+## 📖 Deep Dive
+
+This project is one of 5 AI apps I shipped on Google's Gemini free tier. I wrote up the exact architecture, cost breakdown, and what breaks first in production:
+
+**[$0/Month, 5 AI Apps, All on Gemini: Here's Exactly What the Free Tier Gives You (and What Breaks First)](https://dev.to/tahosin/0month-5-ai-apps-all-on-gemini-heres-exactly-what-the-free-tier-gives-you-and-what-breaks-58fl)** — on Dev.to
+
 ---
 
 ## What It Does
